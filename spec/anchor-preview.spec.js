@@ -23,8 +23,9 @@ describe('Anchor Preview TestCase', function () {
     describe('anchor preview element', function () {
         it('should be displayed on hover of a link element', function () {
             var editor = this.newMediumEditor('.editor', {
-                delay: 200
-            }),
+                    delay: 200
+                }),
+                toolbar = editor.getExtensionByName('toolbar'),
                 sel = window.getSelection(),
                 anchorPreview = editor.getExtensionByName('anchor-preview'),
                 nextRange;
@@ -48,14 +49,14 @@ describe('Anchor Preview TestCase', function () {
             expect(editor.getExtensionByName('anchor').showForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'hideToolbar').and.callThrough();
+            spyOn(MediumEditor.extensions.toolbar.prototype, 'hideToolbar').and.callThrough();
             nextRange = document.createRange();
             nextRange.selectNodeContents(document.getElementById('another-element'));
             sel.removeAllRanges();
             sel.addRange(nextRange);
             fireEvent(document.getElementById('another-element'), 'click');
             jasmine.clock().tick(200);
-            expect(editor.toolbar.hideToolbar).toHaveBeenCalled();
+            expect(toolbar.hideToolbar).toHaveBeenCalled();
         });
 
         it('should be displayed on hover of a link element with markup inside', function () {
@@ -115,7 +116,9 @@ describe('Anchor Preview TestCase', function () {
 
         it('should display the anchor form in the toolbar when clicked', function () {
             var editor = this.newMediumEditor('.editor'),
-                anchorPreview = editor.getExtensionByName('anchor-preview');
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                anchor = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
 
             // show preview
             fireEvent(document.getElementById('test-link'), 'mouseover');
@@ -125,8 +128,8 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(anchorPreview.getPreviewElement(), 'click');
             jasmine.clock().tick(200);
 
-            expect(editor.toolbar.isDisplayed()).toBe(true);
-            expect(editor.getExtensionByName('anchor').isDisplayed()).toBe(true);
+            expect(toolbar.isDisplayed()).toBe(true);
+            expect(anchor.isDisplayed()).toBe(true);
         });
 
         it('should NOT be displayed when the hovered link is empty', function () {

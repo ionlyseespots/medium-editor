@@ -333,12 +333,13 @@ describe('Extensions TestCase', function () {
 
         it('should include extensions button into toolbar', function () {
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['dummy'],
-                extensions: {
-                    'dummy': ExtensionWithElement
-                }
-            });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
+                    buttons: ['dummy'],
+                    extensions: {
+                        'dummy': ExtensionWithElement
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should call checkState on extensions when toolbar selection updates', function () {
@@ -358,22 +359,24 @@ describe('Extensions TestCase', function () {
 
         it('should include extensions button by string into the toolbar', function () {
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['dummy'],
-                extensions: {
-                    'dummy': ExtensionWithString
-                }
-            });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
+                    buttons: ['dummy'],
+                    extensions: {
+                        'dummy': ExtensionWithString
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should not include extensions button into toolbar that are not in "buttons"', function () {
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['bold'],
-                extensions: {
-                    'dummy': ExtensionWithElement
-                }
-            });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(0);
+                    buttons: ['bold'],
+                    extensions: {
+                        'dummy': ExtensionWithElement
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(0);
         });
 
         it('should not include buttons into the toolbar when an overriding extension is present', function () {
@@ -387,10 +390,11 @@ describe('Extensions TestCase', function () {
                     'bold': ext
                 }
             });
+            var toolbar = editor.getExtensionByName('toolbar');
 
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(1);
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
+            expect(toolbar.getToolbarElement().querySelectorAll('button').length).toBe(1);
+            expect(toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
+            expect(toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
             expect(ext.init).toHaveBeenCalled();
         });
     });
