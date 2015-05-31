@@ -12,6 +12,16 @@ var Toolbar;
             this.base.options.elementsContainer.appendChild(this.getToolbarElement());
         },
 
+        // Helper method to execute method for every extension, but ignoring the toolbar extension
+        forEachExtension: function (iterator, context) {
+            return this.base.commands.forEach(function (command) {
+                if (command === this) {
+                    return;
+                }
+                return iterator.apply(context || this, arguments);
+            }, this);
+        },
+
         // Toolbar creation/deletion
 
         createToolbar: function () {
@@ -29,7 +39,7 @@ var Toolbar;
             toolbar.appendChild(this.createToolbarButtons());
 
             // Add any forms that extensions may have
-            this.base.commands.forEach(function (extension) {
+            this.forEachExtension(function (extension) {
                 if (extension.hasForm) {
                     toolbar.appendChild(extension.getForm());
                 }
@@ -209,7 +219,7 @@ var Toolbar;
                 this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 this.base.trigger('hideToolbar', {}, this.base.getFocusedElement());
 
-                this.base.commands.forEach(function (extension) {
+                this.forEachExtension(function (extension) {
                     if (typeof extension.onHide === 'function') {
                         Util.deprecated('onHide', 'the hideToolbar custom event', 'v5.0.0');
                         extension.onHide();
@@ -249,7 +259,7 @@ var Toolbar;
 
         hideExtensionForms: function () {
             // Hide all extension forms
-            this.base.commands.forEach(function (extension) {
+            this.forEachExtension(function (extension) {
                 if (extension.hasForm && extension.isDisplayed()) {
                     extension.hideForm();
                 }
@@ -361,12 +371,12 @@ var Toolbar;
         },
 
         setToolbarButtonStates: function () {
-            this.base.commands.forEach(function (extension) {
+            this.forEachExtension(function (extension) {
                 if (typeof extension.isActive === 'function' &&
                     typeof extension.setInactive === 'function') {
                     extension.setInactive();
                 }
-            }.bind(this));
+            });
 
             this.checkActiveButtons();
         },
@@ -394,30 +404,25 @@ var Toolbar;
 
             parentNode = Selection.getSelectedParentElement(selectionRange);
 
-            // Loop through all commands
-            this.base.commands.forEach(function (command) {
-                // Toolbar is an extension, so skip it
-                if (command.name === 'toolbar') {
-                    return;
-                }
-
-                // For those commands where we can use document.queryCommandState(), do so
-                if (typeof command.queryCommandState === 'function') {
-                    queryState = command.queryCommandState();
+            // Loop through all extensions
+            this.forEachExtension(function (extension) {
+                // For those extensions where we can use document.queryCommandState(), do so
+                if (typeof extension.queryCommandState === 'function') {
+                    queryState = extension.queryCommandState();
                     // If queryCommandState returns a valid value, we can trust the browser
                     // and don't need to do our manual checks
                     if (queryState !== null) {
-                        if (queryState && typeof command.setActive === 'function') {
-                            command.setActive();
+                        if (queryState && typeof extension.setActive === 'function') {
+                            extension.setActive();
                         }
                         return;
                     }
                 }
-                // We can't use queryCommandState for this command, so add to manualStateChecks
-                manualStateChecks.push(command);
+                // We can't use queryCommandState for this extension, so add to manualStateChecks
+                manualStateChecks.push(extension);
             });
 
-            // Climb up the DOM and do manual checks for whether a certain command is currently enabled for this node
+            // Climb up the DOM and do manual checks for whether a certain extension is currently enabled for this node
             while (parentNode.tagName !== undefined && Util.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 manualStateChecks.forEach(updateExtensionState);
 
