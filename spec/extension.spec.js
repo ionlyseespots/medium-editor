@@ -334,7 +334,9 @@ describe('Extensions TestCase', function () {
 
         it('should include extensions button into toolbar', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['dummy'],
+                    toolbar: {
+                        buttons: ['dummy']
+                    },
                     extensions: {
                         'dummy': ExtensionWithElement
                     }
@@ -345,7 +347,9 @@ describe('Extensions TestCase', function () {
 
         it('should call checkState on extensions when toolbar selection updates', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['dummy'],
+                    toolbar: {
+                        buttons: ['dummy']
+                    },
                     extensions: {
                         'dummy': ExtensionWithElement
                     }
@@ -360,7 +364,9 @@ describe('Extensions TestCase', function () {
 
         it('should include extensions button by string into the toolbar', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['dummy'],
+                    toolbar: {
+                        buttons: ['dummy']
+                    },
                     extensions: {
                         'dummy': ExtensionWithString
                     }
@@ -371,7 +377,9 @@ describe('Extensions TestCase', function () {
 
         it('should not include extensions button into toolbar that are not in "buttons"', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['bold'],
+                    toolbar: {
+                        buttons: ['bold']
+                    },
                     extensions: {
                         'dummy': ExtensionWithElement
                     }
@@ -386,7 +394,9 @@ describe('Extensions TestCase', function () {
 
             spyOn(ext, 'init');
             editor = this.newMediumEditor('.editor', {
-                buttons: ['bold', 'italic'],
+                toolbar: {
+                    buttons: ['bold', 'italic']
+                },
                 extensions: {
                     'bold': ext
                 }

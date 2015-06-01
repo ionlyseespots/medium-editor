@@ -263,6 +263,10 @@ function MediumEditor(elements, options) {
             return false;
         }
 
+        if (this.options.toolbar === false) {
+            return false;
+        }
+
         // If any of the elements don't have the toolbar disabled
         // We need a toolbar
         if(this.elements.every(function (element) {
@@ -414,12 +418,27 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function initToolbar() {
+    function initToolbar(options) {
         if (this.options.extensions['toolbar']) {
             return this.options.extensions['toolbar'];
         }
 
-        return new MediumEditor.extensions.toolbar({ options: this.options });
+        // Backwards compatability
+        var defaultsBC = {
+            align: this.options.toolbarAlign, // deprecated
+            buttons: this.options.buttons, // deprecated
+            diffLeft: this.options.diffLeft, // deprecated
+            diffTop: this.options.diffTop, // deprecated
+            firstButtonClass: this.options.firstButtonClass, // deprecated
+            lastButtonClass: this.options.lastButtonClass, // deprecated
+            static: this.options.staticToolbar, // deprecated
+            sticky: this.options.stickyToolbar, // deprecated
+            updateOnEmptySelection: this.options.updateOnEmptySelection // deprecated
+        };
+
+        return new MediumEditor.extensions.toolbar(
+            Util.extend({}, options, defaultsBC)
+        );
     }
 
     function initPlaceholder(options) {
@@ -477,11 +496,18 @@ function MediumEditor(elements, options) {
     }
 
     function initCommands() {
-        var buttons = this.options.buttons,
+        var buttons = MediumEditor.extensions.toolbar.prototype.buttons,
             extensions = this.options.extensions,
             ext,
             name;
         this.commands = [];
+
+        if (this.options.toolbar && this.options.toolbar.buttons) {
+            buttons = this.options.toolbar.buttons;
+        } else if (this.options.buttons) {
+            // TODO: Deprecate
+            buttons = this.options.buttons;
+        }
 
         buttons.forEach(function (buttonName) {
             if (extensions[buttonName]) {
@@ -533,7 +559,7 @@ function MediumEditor(elements, options) {
         }
 
         if (isToolbarEnabled.call(this)) {
-            this.commands.push(initExtension(initToolbar.call(this, this.options), 'toolbar', this));
+            this.commands.push(initExtension(initToolbar.call(this, this.options.toolbar), 'toolbar', this));
 
             // TODO: Deprecate (this.toolbar is only around for backwards compatability)
             this.toolbar = this.getExtensionByName('toolbar');
@@ -554,7 +580,17 @@ function MediumEditor(elements, options) {
             ['disableAnchorPreview', 'anchorPreview: false'],
             ['disablePlaceholders', 'placeholder: false'],
             ['onShowToolbar', 'showToolbar custom event'],
-            ['onHideToolbar', 'hideToolbar custom event']
+            ['onHideToolbar', 'hideToolbar custom event'],
+            ['toolbarAlign', 'toolbar.align'],
+            ['buttons', 'toolbar.buttons'],
+            ['diffLeft', 'toolbar.diffLeft'],
+            ['diffTop', 'toolbar.diffTop'],
+            ['firstButtonClass', 'toolbar.firstButtonClass'],
+            ['lastButtonClass', 'toolbar.lastButtonClass'],
+            ['staticToolbar', 'toolbar.static'],
+            ['stickyToolbar', 'toolbar.sticky'],
+            ['updateOnEmptySelection', 'toolbar.updateOnEmptySelection'],
+            ['disableToolbar', 'toolbar: false']
         ];
         // warn about using deprecated properties
         if (options) {

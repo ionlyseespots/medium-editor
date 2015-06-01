@@ -167,9 +167,9 @@ describe('Anchor Preview TestCase', function () {
             expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
         });
 
-        it('should not be present when disableToolbar option is passed', function () {
+        it('should not be present when toolbar option is disabled', function () {
             var editor = this.newMediumEditor('.editor', {
-                disableToolbar: true
+                toolbar: false
             }),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
